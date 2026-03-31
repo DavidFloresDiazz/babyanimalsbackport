@@ -1,14 +1,23 @@
 package babyanimalsbackport.entity;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.animal.Cow;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 
 public class NewBabyCow extends Cow {
+    private static final int GROWTH_TICKS = 24000; // 20 minutos
+    private static final EntityDataAccessor<Integer> BIOME_TYPE =
+            SynchedEntityData.defineId(NewBabyCow.class, net.minecraft.network.syncher.EntityDataSerializers.INT);
+
+    private int ageTicks = 0;
+    private boolean biomeTypeDetermined = false;
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Cow.createAttributes(); // copiamos los atributos de la vaca
+        return Cow.createAttributes();
     }
 
     public NewBabyCow(EntityType<? extends Cow> type, Level level) {
@@ -16,7 +25,89 @@ public class NewBabyCow extends Cow {
     }
 
     @Override
-    public boolean isBaby() {
-        return true; // Siempre se comporta como bebé
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(BIOME_TYPE, 1); // 1 = Templado por defecto
+    }
+
+    private void determineBiomeType() {
+        if (!this.biomeTypeDetermined) {
+            float biomeTemp = this.level().getBiome(this.blockPosition()).value().getBaseTemperature();
+
+            int biomeType;
+            if (biomeTemp < 0.1F) {
+                biomeType = 0; // Frío
+            } else if (biomeTemp > 1.0F) {
+                biomeType = 2; // Cálido
+            } else {
+                biomeType = 1; // Templado
+            }
+
+            this.entityData.set(BIOME_TYPE, biomeType);
+            this.biomeTypeDetermined = true;
+            System.out.println("[NewBabyCow] Biome type determined: " + biomeType + " (temp: " + biomeTemp + ")");
+        }
+    }
+
+    public int getBiomeType() {
+        return this.entityData.get(BIOME_TYPE);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        // Determinar tipo de bioma en el primer tick
+        if (!this.level().isClientSide && !this.biomeTypeDetermined) {
+            this.determineBiomeType();
+        }
+
+        // Asegurarse que siempre es bebé en el servidor
+        if (!this.level().isClientSide && !this.isBaby()) {
+            this.setBaby(true);
+        }
+
+        if (!this.level().isClientSide && this.isBaby()) {
+            ageTicks++;
+
+            if (ageTicks % 100 == 0) {
+                System.out.println("[NewBabyCow] Age: " + ageTicks + " / " + GROWTH_TICKS);
+            }
+
+            if (ageTicks >= GROWTH_TICKS) {
+                System.out.println("[NewBabyCow] ¡CONVERTIENDO A VACA ADULTA!");
+                this.convertToAdultCow();
+            }
+        }
+    }
+
+    private void convertToAdultCow() {
+        Cow adultCow = new Cow(EntityType.COW, this.level());
+        adultCow.moveTo(this.getX(), this.getY(), this.getZ());
+        adultCow.setYRot(this.getYRot());
+        adultCow.setXRot(this.getXRot());
+        adultCow.setHealth(this.getHealth());
+
+        this.level().addFreshEntity(adultCow);
+        this.discard();
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        tag.putInt("AgeTicks", this.ageTicks);
+        tag.putInt("BiomeType", this.entityData.get(BIOME_TYPE));
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        if (tag.contains("AgeTicks")) {
+            this.ageTicks = tag.getInt("AgeTicks");
+        }
+        if (tag.contains("BiomeType")) {
+            this.entityData.set(BIOME_TYPE, tag.getInt("BiomeType"));
+            this.biomeTypeDetermined = true;
+        }
     }
 }
