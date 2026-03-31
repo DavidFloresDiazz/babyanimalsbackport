@@ -32,30 +32,58 @@ public class NewBabyCow extends Cow {
 
     private void determineBiomeType() {
         if (!this.biomeTypeDetermined) {
-            float biomeTemp = this.level().getBiome(this.blockPosition()).value().getBaseTemperature();
-
-            int biomeType;
-            if (biomeTemp < 0.1F) {
-                biomeType = 0; // Frío
-            } else if (biomeTemp > 1.0F) {
-                biomeType = 2; // Cálido
-            } else {
-                biomeType = 1; // Templado
+            // Null check para evitar NullPointerException
+            if (this.level() == null) {
+                System.err.println("[ERROR] NewBabyCow.level() es null!");
+                this.biomeTypeDetermined = true;
+                return;
             }
 
-            this.entityData.set(BIOME_TYPE, biomeType);
-            this.biomeTypeDetermined = true;
-            System.out.println("[NewBabyCow] Biome type determined: " + biomeType + " (temp: " + biomeTemp + ")");
+            if (this.blockPosition() == null) {
+                System.err.println("[ERROR] NewBabyCow.blockPosition() es null!");
+                this.biomeTypeDetermined = true;
+                return;
+            }
+
+            try {
+                float biomeTemp = this.level().getBiome(this.blockPosition()).value().getBaseTemperature();
+
+                int biomeType;
+                if (biomeTemp < 0.1F) {
+                    biomeType = 0; // Frío
+                } else if (biomeTemp > 1.0F) {
+                    biomeType = 2; // Cálido
+                } else {
+                    biomeType = 1; // Templado
+                }
+
+                this.entityData.set(BIOME_TYPE, biomeType);
+                this.biomeTypeDetermined = true;
+                System.out.println("[NewBabyCow] Biome type determined: " + biomeType + " (temp: " + biomeTemp + ")");
+            } catch (Exception e) {
+                System.err.println("[ERROR] Exception al determinar biome type:");
+                e.printStackTrace();
+                this.biomeTypeDetermined = true;
+            }
         }
     }
 
     public int getBiomeType() {
+        if (this.entityData == null) {
+            return 1; // Valor por defecto
+        }
         return this.entityData.get(BIOME_TYPE);
     }
 
     @Override
     public void tick() {
         super.tick();
+
+        // Null check para el level
+        if (this.level() == null) {
+            System.err.println("[ERROR] NewBabyCow.tick() - level() es null!");
+            return;
+        }
 
         // Determinar tipo de bioma en el primer tick
         if (!this.level().isClientSide && !this.biomeTypeDetermined) {
@@ -82,21 +110,33 @@ public class NewBabyCow extends Cow {
     }
 
     private void convertToAdultCow() {
-        Cow adultCow = new Cow(EntityType.COW, this.level());
-        adultCow.moveTo(this.getX(), this.getY(), this.getZ());
-        adultCow.setYRot(this.getYRot());
-        adultCow.setXRot(this.getXRot());
-        adultCow.setHealth(this.getHealth());
+        if (this.level() == null) {
+            System.err.println("[ERROR] NewBabyCow.convertToAdultCow() - level() es null!");
+            return;
+        }
 
-        this.level().addFreshEntity(adultCow);
-        this.discard();
+        try {
+            Cow adultCow = new Cow(EntityType.COW, this.level());
+            adultCow.moveTo(this.getX(), this.getY(), this.getZ());
+            adultCow.setYRot(this.getYRot());
+            adultCow.setXRot(this.getXRot());
+            adultCow.setHealth(this.getHealth());
+
+            this.level().addFreshEntity(adultCow);
+            this.discard();
+        } catch (Exception e) {
+            System.err.println("[ERROR] Exception al convertir a vaca adulta:");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putInt("AgeTicks", this.ageTicks);
-        tag.putInt("BiomeType", this.entityData.get(BIOME_TYPE));
+        if (this.entityData != null) {
+            tag.putInt("BiomeType", this.entityData.get(BIOME_TYPE));
+        }
     }
 
     @Override
@@ -105,7 +145,7 @@ public class NewBabyCow extends Cow {
         if (tag.contains("AgeTicks")) {
             this.ageTicks = tag.getInt("AgeTicks");
         }
-        if (tag.contains("BiomeType")) {
+        if (tag.contains("BiomeType") && this.entityData != null) {
             this.entityData.set(BIOME_TYPE, tag.getInt("BiomeType"));
             this.biomeTypeDetermined = true;
         }

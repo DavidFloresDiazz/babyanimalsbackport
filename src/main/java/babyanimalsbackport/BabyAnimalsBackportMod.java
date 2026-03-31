@@ -2,7 +2,8 @@ package babyanimalsbackport;
 
 import babyanimalsbackport.entity.ModEntities;
 import babyanimalsbackport.entity.NewBabyCow;
-import net.minecraft.world.entity.animal.Cow;
+import babyanimalsbackport.entity.NewBabyRedMushroom;
+import babyanimalsbackport.entity.NewBabyBrownMushroom;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
@@ -20,9 +21,20 @@ public class BabyAnimalsBackportMod {
     }
 
     private void registerAttributes(EntityAttributeCreationEvent event) {
+        // Registrar atributos para todas las entidades personalizadas
         event.put(
                 ModEntities.NEW_BABY_COW.get(),
                 NewBabyCow.createAttributes().build()
+        );
+
+        event.put(
+                ModEntities.NEW_BABY_RED_MUSHROOM.get(),
+                NewBabyRedMushroom.createAttributes().build()
+        );
+
+        event.put(
+                ModEntities.NEW_BABY_BROWN_MUSHROOM.get(),
+                NewBabyBrownMushroom.createAttributes().build()
         );
     }
 }

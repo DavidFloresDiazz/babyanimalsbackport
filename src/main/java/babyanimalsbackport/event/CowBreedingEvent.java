@@ -16,25 +16,42 @@ public class CowBreedingEvent {
 
     @SubscribeEvent
     public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
+
+        // Validación básica
+        if (event.getEntity() == null || event.getLevel() == null) {
+            return;
+        }
+
         // Vaca bebé
         if (event.getEntity() instanceof Cow
                 && !(event.getEntity() instanceof NewBabyCow)
                 && !(event.getEntity() instanceof MushroomCow)
                 && ((Cow) event.getEntity()).isBaby()) {
 
-            Cow normalCow = (Cow) event.getEntity();
+            try {
+                Cow normalCow = (Cow) event.getEntity();
 
-            System.out.println("[CowBreedingEvent] Vaca bebé detectada, reemplazando...");
+                // Validar que el EntityType está registrado
+                if (ModEntities.NEW_BABY_COW.get() == null) {
+                    System.err.println("[ERROR] NEW_BABY_COW EntityType no está registrado!");
+                    return;
+                }
 
-            NewBabyCow babyCow = new NewBabyCow(ModEntities.NEW_BABY_COW.get(), normalCow.level());
-            babyCow.moveTo(normalCow.getX(), normalCow.getY(), normalCow.getZ());
-            babyCow.setHealth(normalCow.getHealth());
-            babyCow.setBaby(true);
+                System.out.println("[CowBreedingEvent] Vaca bebé detectada, reemplazando...");
 
-            event.setCanceled(true);
-            normalCow.level().addFreshEntity(babyCow);
+                NewBabyCow babyCow = new NewBabyCow(ModEntities.NEW_BABY_COW.get(), normalCow.level());
+                babyCow.moveTo(normalCow.getX(), normalCow.getY(), normalCow.getZ());
+                babyCow.setHealth(normalCow.getHealth());
+                babyCow.setBaby(true);
 
-            System.out.println("[CowBreedingEvent] ¡Nueva baby cow nacida!");
+                event.setCanceled(true);
+                normalCow.level().addFreshEntity(babyCow);
+
+                System.out.println("[CowBreedingEvent] ¡Nueva baby cow nacida!");
+            } catch (Exception e) {
+                System.err.println("[ERROR] Exception en CowBreedingEvent para vaca bebé:");
+                e.printStackTrace();
+            }
         }
 
         // Mooshroom bebé
@@ -43,32 +60,53 @@ public class CowBreedingEvent {
                 && !(event.getEntity() instanceof NewBabyBrownMushroom)
                 && ((MushroomCow) event.getEntity()).isBaby()) {
 
-            MushroomCow normalMushroom = (MushroomCow) event.getEntity();
+            try {
+                MushroomCow normalMushroom = (MushroomCow) event.getEntity();
 
-            System.out.println("[CowBreedingEvent] Mooshroom bebé detectado, reemplazando...");
+                // Validar que los EntityTypes están registrados
+                if (ModEntities.NEW_BABY_RED_MUSHROOM.get() == null) {
+                    System.err.println("[ERROR] NEW_BABY_RED_MUSHROOM EntityType no está registrado!");
+                    return;
+                }
+                if (ModEntities.NEW_BABY_BROWN_MUSHROOM.get() == null) {
+                    System.err.println("[ERROR] NEW_BABY_BROWN_MUSHROOM EntityType no está registrado!");
+                    return;
+                }
 
-            Random rng = new Random();
+                System.out.println("[CowBreedingEvent] Mooshroom bebé detectado, reemplazando...");
 
-            // Decidir si es rojo o marrón basándose en el NBT o aleatoriamente
-            if (rng.nextBoolean()){
-                NewBabyRedMushroom babyMushroom = new NewBabyRedMushroom(ModEntities.NEW_BABY_RED_MUSHROOM.get(), normalMushroom.level());
-                babyMushroom.moveTo(normalMushroom.getX(), normalMushroom.getY(), normalMushroom.getZ());
-                babyMushroom.setHealth(normalMushroom.getHealth());
-                babyMushroom.setBaby(true);
+                Random rng = new Random();
 
-                event.setCanceled(true);
-                normalMushroom.level().addFreshEntity(babyMushroom);
-            } else {
-                NewBabyBrownMushroom babyMushroom = new NewBabyBrownMushroom(ModEntities.NEW_BABY_BROWN_MUSHROOM.get(), normalMushroom.level());
-                babyMushroom.moveTo(normalMushroom.getX(), normalMushroom.getY(), normalMushroom.getZ());
-                babyMushroom.setHealth(normalMushroom.getHealth());
-                babyMushroom.setBaby(true);
+                // Decidir si es rojo o marrón basándose en el NBT o aleatoriamente
+                if (rng.nextBoolean()) {
+                    NewBabyRedMushroom babyMushroom = new NewBabyRedMushroom(
+                            ModEntities.NEW_BABY_RED_MUSHROOM.get(),
+                            normalMushroom.level()
+                    );
+                    babyMushroom.moveTo(normalMushroom.getX(), normalMushroom.getY(), normalMushroom.getZ());
+                    babyMushroom.setHealth(normalMushroom.getHealth());
+                    babyMushroom.setBaby(true);
 
-                event.setCanceled(true);
-                normalMushroom.level().addFreshEntity(babyMushroom);
+                    event.setCanceled(true);
+                    normalMushroom.level().addFreshEntity(babyMushroom);
+                } else {
+                    NewBabyBrownMushroom babyMushroom = new NewBabyBrownMushroom(
+                            ModEntities.NEW_BABY_BROWN_MUSHROOM.get(),
+                            normalMushroom.level()
+                    );
+                    babyMushroom.moveTo(normalMushroom.getX(), normalMushroom.getY(), normalMushroom.getZ());
+                    babyMushroom.setHealth(normalMushroom.getHealth());
+                    babyMushroom.setBaby(true);
+
+                    event.setCanceled(true);
+                    normalMushroom.level().addFreshEntity(babyMushroom);
+                }
+
+                System.out.println("[CowBreedingEvent] ¡Nuevo baby mooshroom nacido!");
+            } catch (Exception e) {
+                System.err.println("[ERROR] Exception en CowBreedingEvent para mooshroom bebé:");
+                e.printStackTrace();
             }
-
-            System.out.println("[CowBreedingEvent] ¡Nuevo baby mooshroom nacido!");
         }
     }
 }

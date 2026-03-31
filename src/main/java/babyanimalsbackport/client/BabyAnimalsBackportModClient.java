@@ -1,6 +1,8 @@
 package babyanimalsbackport.client;
 
 import babyanimalsbackport.client.model.NewBabyCowModel;
+import babyanimalsbackport.client.model.NewBabyRedMushroomModel;
+import babyanimalsbackport.client.model.NewBabyBrownMushroomModel;
 import babyanimalsbackport.entity.ModEntities;
 import babyanimalsbackport.entity.NewBabyCow;
 import babyanimalsbackport.entity.NewBabyRedMushroom;
@@ -8,9 +10,7 @@ import babyanimalsbackport.entity.NewBabyBrownMushroom;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Mob;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -22,9 +22,17 @@ public class BabyAnimalsBackportModClient {
     public static final ModelLayerLocation BABY_COW_LAYER =
             new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath("babyanimalsbackport", "baby_cow"), "main");
 
+    public static final ModelLayerLocation BABY_RED_MUSHROOM_LAYER =
+            new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath("babyanimalsbackport", "baby_red_mushroom"), "main");
+
+    public static final ModelLayerLocation BABY_BROWN_MUSHROOM_LAYER =
+            new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath("babyanimalsbackport", "baby_brown_mushroom"), "main");
+
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(BABY_COW_LAYER, NewBabyCowModel::createBodyLayer);
+        event.registerLayerDefinition(BABY_RED_MUSHROOM_LAYER, NewBabyRedMushroomModel::createBodyLayer);
+        event.registerLayerDefinition(BABY_BROWN_MUSHROOM_LAYER, NewBabyBrownMushroomModel::createBodyLayer);
     }
 
     @SubscribeEvent
@@ -74,13 +82,13 @@ public class BabyAnimalsBackportModClient {
         }
     }
 
-    public static class NewBabyRedMushroomRenderer extends MobRenderer<NewBabyRedMushroom, EntityModel<NewBabyRedMushroom>> {
+    public static class NewBabyRedMushroomRenderer extends MobRenderer<NewBabyRedMushroom, NewBabyRedMushroomModel> {
 
         private static final ResourceLocation RED_MUSHROOM_BABY_TEXTURE =
                 ResourceLocation.fromNamespaceAndPath("babyanimalsbackport", "textures/entity/mushroom/red_mushroom_baby.png");
 
         public NewBabyRedMushroomRenderer(EntityRendererProvider.Context context) {
-            super(context, new net.minecraft.client.model.CowModel(context.bakeLayer(net.minecraft.client.model.geom.ModelLayers.COW)), 0.7F);
+            super(context, new NewBabyRedMushroomModel(context.bakeLayer(BABY_RED_MUSHROOM_LAYER)), 0.7F);
         }
 
         @Override
@@ -89,13 +97,13 @@ public class BabyAnimalsBackportModClient {
         }
     }
 
-    public static class NewBabyBrownMushroomRenderer extends MobRenderer<NewBabyBrownMushroom, EntityModel<NewBabyBrownMushroom>> {
+    public static class NewBabyBrownMushroomRenderer extends MobRenderer<NewBabyBrownMushroom, NewBabyBrownMushroomModel> {
 
         private static final ResourceLocation BROWN_MUSHROOM_BABY_TEXTURE =
                 ResourceLocation.fromNamespaceAndPath("babyanimalsbackport", "textures/entity/mushroom/brown_mushroom_baby.png");
 
         public NewBabyBrownMushroomRenderer(EntityRendererProvider.Context context) {
-            super(context, new net.minecraft.client.model.CowModel(context.bakeLayer(net.minecraft.client.model.geom.ModelLayers.COW)), 0.7F);
+            super(context, new NewBabyBrownMushroomModel(context.bakeLayer(BABY_BROWN_MUSHROOM_LAYER)), 0.7F);
         }
 
         @Override

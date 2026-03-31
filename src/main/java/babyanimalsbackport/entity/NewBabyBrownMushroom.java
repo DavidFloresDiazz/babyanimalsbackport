@@ -21,6 +21,12 @@ public class NewBabyBrownMushroom extends MushroomCow {
 
     @Override
     public void tick() {
+        // Null check para el level
+        if (this.level() == null) {
+            System.err.println("[ERROR] NewBabyBrownMushroom.tick() - level() es null!");
+            return;
+        }
+
         super.tick();
 
         // Inicializar como bebé
@@ -49,14 +55,24 @@ public class NewBabyBrownMushroom extends MushroomCow {
     }
 
     private void convertToAdultMushroom() {
-        MushroomCow adultMushroom = new MushroomCow(EntityType.MOOSHROOM, this.level());
-        adultMushroom.moveTo(this.getX(), this.getY(), this.getZ());
-        adultMushroom.setYRot(this.getYRot());
-        adultMushroom.setXRot(this.getXRot());
-        adultMushroom.setHealth(this.getHealth());
+        if (this.level() == null) {
+            System.err.println("[ERROR] NewBabyBrownMushroom.convertToAdultMushroom() - level() es null!");
+            return;
+        }
 
-        this.level().addFreshEntity(adultMushroom);
-        this.discard();
+        try {
+            MushroomCow adultMushroom = new MushroomCow(EntityType.MOOSHROOM, this.level());
+            adultMushroom.moveTo(this.getX(), this.getY(), this.getZ());
+            adultMushroom.setYRot(this.getYRot());
+            adultMushroom.setXRot(this.getXRot());
+            adultMushroom.setHealth(this.getHealth());
+
+            this.level().addFreshEntity(adultMushroom);
+            this.discard();
+        } catch (Exception e) {
+            System.err.println("[ERROR] Exception al convertir a mooshroom adulto:");
+            e.printStackTrace();
+        }
     }
 
     @Override
