@@ -1,9 +1,6 @@
 package babyanimalsbackport;
 
-import babyanimalsbackport.entity.ModEntities;
-import babyanimalsbackport.entity.NewBabyCow;
-import babyanimalsbackport.entity.NewBabyRedMushroom;
-import babyanimalsbackport.entity.NewBabyBrownMushroom;
+import babyanimalsbackport.entity.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
@@ -35,6 +32,11 @@ public class BabyAnimalsBackportMod {
         event.put(
                 ModEntities.NEW_BABY_BROWN_MUSHROOM.get(),
                 NewBabyBrownMushroom.createAttributes().build()
+        );
+
+        event.put(
+                ModEntities.NEW_BABY_CHICKEN.get(),
+                NewBabyChicken.createAttributes().build()
         );
     }
 }
