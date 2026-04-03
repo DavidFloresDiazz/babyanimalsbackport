@@ -38,5 +38,9 @@ public class BabyAnimalsBackportMod {
                 ModEntities.NEW_BABY_CHICKEN.get(),
                 NewBabyChicken.createAttributes().build()
         );
+        event.put(
+                ModEntities.NEW_BABY_SHEEP.get(),
+                NewBabySheep.createAttributes().build()
+        );
     }
 }

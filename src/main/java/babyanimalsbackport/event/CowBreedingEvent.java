@@ -10,6 +10,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import java.util.Random;
+import net.minecraft.world.entity.animal.Sheep;
+import babyanimalsbackport.entity.NewBabySheep;
 
 @EventBusSubscriber(modid = "babyanimalsbackport")
 public class CowBreedingEvent {
@@ -105,6 +107,39 @@ public class CowBreedingEvent {
                 System.out.println("[CowBreedingEvent] ¡Nuevo baby mooshroom nacido!");
             } catch (Exception e) {
                 System.err.println("[ERROR] Exception en CowBreedingEvent para mooshroom bebé:");
+                e.printStackTrace();
+            }
+        } // Oveja bebé
+        else if (event.getEntity() instanceof Sheep
+                && !(event.getEntity() instanceof NewBabySheep)
+                && ((Sheep) event.getEntity()).isBaby()) {
+
+            try {
+                Sheep normalSheep = (Sheep) event.getEntity();
+
+                // Validar que el EntityType está registrado
+                if (ModEntities.NEW_BABY_SHEEP.get() == null) {
+                    System.err.println("[ERROR] NEW_BABY_SHEEP EntityType no está registrado!");
+                    return;
+                }
+
+                System.out.println("[CowBreedingEvent] Oveja bebé detectada, reemplazando...");
+
+                NewBabySheep babySheep = new NewBabySheep(ModEntities.NEW_BABY_SHEEP.get(), normalSheep.level());
+                babySheep.moveTo(normalSheep.getX(), normalSheep.getY(), normalSheep.getZ());
+                babySheep.setHealth(normalSheep.getHealth());
+                babySheep.setBaby(true);
+                // Copiar color de lana si es posible
+                if (normalSheep instanceof Sheep) {
+                    babySheep.setColor(((Sheep) normalSheep).getColor());
+                }
+
+                event.setCanceled(true);
+                normalSheep.level().addFreshEntity(babySheep);
+
+                System.out.println("[CowBreedingEvent] ¡Nueva baby sheep nacida!");
+            } catch (Exception e) {
+                System.err.println("[ERROR] Exception en CowBreedingEvent para oveja bebé:");
                 e.printStackTrace();
             }
         }

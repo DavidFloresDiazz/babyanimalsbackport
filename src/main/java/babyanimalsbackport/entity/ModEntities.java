@@ -46,6 +46,11 @@ public class ModEntities {
                             .sized(0.45F, 0.7F)
                             .build("new_baby_chicken")
             );
-
+    public static final DeferredHolder<EntityType<?>, EntityType<NewBabySheep>> NEW_BABY_SHEEP =
+            ENTITY_TYPES.register("new_baby_sheep", () ->
+                    EntityType.Builder.<NewBabySheep>of(NewBabySheep::new, MobCategory.CREATURE)
+                            .sized(0.6F, 1.3F)
+                            .build("new_baby_sheep")
+            );
 
 }

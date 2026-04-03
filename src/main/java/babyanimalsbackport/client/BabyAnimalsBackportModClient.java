@@ -4,7 +4,7 @@ import babyanimalsbackport.client.model.NewBabyChickenModel;
 import babyanimalsbackport.client.model.NewBabyCowModel;
 import babyanimalsbackport.client.model.NewBabyRedMushroomModel;
 import babyanimalsbackport.client.model.NewBabyBrownMushroomModel;
-import babyanimalsbackport.client.renderer.NewBabyChickenRenderer;
+import babyanimalsbackport.client.model.NewBabySheepModel;
 import babyanimalsbackport.entity.*;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -16,6 +16,9 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import babyanimalsbackport.client.model.NewBabySheepModel;
+import babyanimalsbackport.entity.NewBabySheep;
+
 
 @EventBusSubscriber(modid = "babyanimalsbackport", value = Dist.CLIENT)
 public class BabyAnimalsBackportModClient {
@@ -33,7 +36,9 @@ public class BabyAnimalsBackportModClient {
     //POLLO
     public static final ModelLayerLocation BABY_CHICKEN_LAYER =
             new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath("babyanimalsbackport", "baby_chicken"), "main");
-
+    //OVEJA
+    public static final ModelLayerLocation BABY_SHEEP_LAYER =
+            new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath("babyanimalsbackport", "baby_sheep"), "main");
 
 
     @SubscribeEvent
@@ -42,6 +47,7 @@ public class BabyAnimalsBackportModClient {
         event.registerLayerDefinition(BABY_RED_MUSHROOM_LAYER, NewBabyRedMushroomModel::createBodyLayer);
         event.registerLayerDefinition(BABY_BROWN_MUSHROOM_LAYER, NewBabyBrownMushroomModel::createBodyLayer);
         event.registerLayerDefinition(BABY_CHICKEN_LAYER, NewBabyChickenModel::createBodyLayer);
+        event.registerLayerDefinition(BABY_SHEEP_LAYER, NewBabySheepModel::createBodyLayer);
     }
 
     @SubscribeEvent
@@ -63,6 +69,10 @@ public class BabyAnimalsBackportModClient {
         event.registerEntityRenderer(
                 ModEntities.NEW_BABY_CHICKEN.get(),
                 context -> new NewBabyChickenRenderer(context)
+        );
+        event.registerEntityRenderer(
+                ModEntities.NEW_BABY_SHEEP.get(),
+                context -> new NewBabySheepRenderer(context)
         );
     }
 
@@ -212,6 +222,20 @@ public class BabyAnimalsBackportModClient {
                 default:
                     return CHICKEN_BABY_TEMPERATE_TEXTURE;
             }
+        }
+    }
+    public static class NewBabySheepRenderer extends MobRenderer<NewBabySheep, NewBabySheepModel> {
+
+        private static final ResourceLocation BABY_SHEEP_TEXTURE =
+                ResourceLocation.fromNamespaceAndPath("babyanimalsbackport", "textures/entity/sheep/sheep_temperate_baby.png");
+
+        public NewBabySheepRenderer(EntityRendererProvider.Context context) {
+            super(context, (NewBabySheepModel) (NewBabySheepModel)new NewBabySheepModel(context.bakeLayer(BABY_SHEEP_LAYER)), 0.7F);
+        }
+
+        @Override
+        public ResourceLocation getTextureLocation(NewBabySheep entity) {
+            return BABY_SHEEP_TEXTURE;
         }
     }
 }
