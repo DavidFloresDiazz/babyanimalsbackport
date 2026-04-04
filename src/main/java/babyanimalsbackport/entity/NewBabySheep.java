@@ -29,18 +29,8 @@ public class NewBabySheep extends Sheep {
 
         super.tick();
 
-        // Inicializar como bebé
-        if (!this.level().isClientSide && !this.isInitialized) {
-            this.setBaby(true);
-            this.isInitialized = true;
-        }
 
-        // Asegurarse que siempre es bebé en el servidor
-        if (!this.level().isClientSide && !this.isBaby()) {
-            this.setBaby(true);
-        }
-
-        if (!this.level().isClientSide && this.isBaby()) {
+        if (!this.level().isClientSide) {
             ageTicks++;
 
             if (ageTicks % 100 == 0) {

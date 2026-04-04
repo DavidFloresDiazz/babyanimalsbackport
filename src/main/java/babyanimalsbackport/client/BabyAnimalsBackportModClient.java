@@ -16,6 +16,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import babyanimalsbackport.client.renderer.NewBabySheepRenderer;
 import babyanimalsbackport.client.model.NewBabySheepModel;
 import babyanimalsbackport.entity.NewBabySheep;
 
@@ -222,20 +223,6 @@ public class BabyAnimalsBackportModClient {
                 default:
                     return CHICKEN_BABY_TEMPERATE_TEXTURE;
             }
-        }
-    }
-    public static class NewBabySheepRenderer extends MobRenderer<NewBabySheep, NewBabySheepModel> {
-
-        private static final ResourceLocation BABY_SHEEP_TEXTURE =
-                ResourceLocation.fromNamespaceAndPath("babyanimalsbackport", "textures/entity/sheep/sheep_temperate_baby.png");
-
-        public NewBabySheepRenderer(EntityRendererProvider.Context context) {
-            super(context, (NewBabySheepModel) (NewBabySheepModel)new NewBabySheepModel(context.bakeLayer(BABY_SHEEP_LAYER)), 0.7F);
-        }
-
-        @Override
-        public ResourceLocation getTextureLocation(NewBabySheep entity) {
-            return BABY_SHEEP_TEXTURE;
         }
     }
 }
